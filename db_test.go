@@ -1,24 +1,23 @@
-package filedb_test
+package filedb
 
 import (
 	"encoding/json"
 	"testing"
 
-	"github.com/matryer/filedb"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDial(t *testing.T) {
 
-	db, err := filedb.Dial("test/missing")
-	require.Equal(t, err, filedb.ErrDBNotFound)
+	db, err := Dial("test/missing")
+	require.Equal(t, err, ErrDBNotFound)
 	require.Nil(t, db)
 
-	db, err = filedb.Dial("test/file.txt")
-	require.Equal(t, err, filedb.ErrDBNotFound)
+	db, err = Dial("test/file.txt")
+	require.Equal(t, err, ErrDBNotFound)
 	require.Nil(t, db)
 
-	db, err = filedb.Dial("test/db")
+	db, err = Dial("test/db")
 	require.NoError(t, err)
 	require.NotNil(t, db)
 	db.Close()
@@ -27,7 +26,7 @@ func TestDial(t *testing.T) {
 
 func TestC(t *testing.T) {
 
-	db, err := filedb.Dial("test/db")
+	db, err := Dial("test/db")
 	require.NoError(t, err)
 	defer db.Close()
 	c, err := db.C("people")
@@ -44,7 +43,7 @@ func TestC(t *testing.T) {
 
 func TestCollections(t *testing.T) {
 
-	db, err := filedb.Dial("test/db")
+	db, err := Dial("test/db")
 	require.NoError(t, err)
 	defer db.Close()
 
@@ -66,7 +65,7 @@ func TestCollections(t *testing.T) {
 
 func TestInsert(t *testing.T) {
 
-	db, err := filedb.Dial("test/db")
+	db, err := Dial("test/db")
 	require.NoError(t, err)
 	defer db.Close()
 	c, err := db.C("people")
@@ -80,7 +79,7 @@ func TestInsert(t *testing.T) {
 
 func TestForEach(t *testing.T) {
 
-	db, err := filedb.Dial("test/db")
+	db, err := Dial("test/db")
 	require.NoError(t, err)
 	defer db.Close()
 	c, err := db.C("people")

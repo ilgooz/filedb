@@ -14,17 +14,17 @@ import (
 	"errors"
 )
 
+const (
+	// Ext is the extension for filedb files.
+	Ext string = ".filedb"
+
+	// CNameFormat represents the collection name format.
+	CNameFormat = "%s" + Ext
+)
+
 var (
 	// ErrDBNotFound occurs when a database could not be found.
 	ErrDBNotFound = errors.New("database not found; expected existing directory")
-)
-
-// Ext is the extension for filedb files.
-const Ext string = ".filedb"
-
-var (
-	// CNameFormat represents the collection name format.
-	CNameFormat = "%s" + Ext
 )
 
 // DB represents a database of collections.
@@ -37,13 +37,23 @@ type DB struct {
 func Dial(d string) (*DB, error) {
 	var err error
 	var i os.FileInfo
-	if i, err = os.Stat(d); os.IsNotExist(err) {
-		return nil, ErrDBNotFound
-	}
-	if !i.IsDir() {
+	if i, err = os.Stat(d); os.IsNotExist(err) || !i.IsDir() {
 		return nil, ErrDBNotFound
 	}
 	return &DB{path: d, cs: make(map[string]*C)}, nil
+}
+
+// Usal Dial() also creates the db if not exists
+func DialForce(d string) (*DB, error) {
+	db, err := Dial(d)
+	if err == ErrDBNotFound {
+		err = os.Mkdir(d, os.ModePerm)
+		if err != nil {
+			return nil, err
+		}
+		return Dial(d)
+	}
+	return db, err
 }
 
 // ColNames gets a list of all collections in the

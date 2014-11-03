@@ -24,6 +24,19 @@ func TestDial(t *testing.T) {
 
 }
 
+func TestDialForce(t *testing.T) {
+	// create
+	db, err := DialForce("test/force")
+	defer db.Close()
+	require.NotNil(t, db)
+	require.Nil(t, err)
+
+	// write
+	c, err := db.C("test")
+	err = c.Insert([]byte("test"))
+	require.Nil(t, err)
+}
+
 func TestC(t *testing.T) {
 
 	db, err := Dial("test/db")
